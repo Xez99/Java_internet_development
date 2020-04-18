@@ -1,5 +1,8 @@
 package org.xez.jip.labs;
 
+import org.xez.jip.labs.locale.LocaleConfig;
+import org.xez.jip.labs.locale.LocaleProvider;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -7,15 +10,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * WebServlet
- * @param user - filter by user in table
+ * @QueryParams user - filter by user in table
+ * @QueryParams lang - use specific locale if supported
  */
 @WebServlet("/orders")
 public class Start extends HttpServlet {
+
+    private static final String LANGUAGE = "lang";
+
+    /** Resource Bundle properties Keys */
+    private static final String ORDER_LIST  = "orderList";
+    private static final String ORDER_NUMBER= "orderNumber";
+    private static final String USER        = "user";
+    private static final String FULL_NAME   = "fullName";
+    private static final String PRODUCT_ID  = "productId";
+    private static final String AMOUNT      = "amount";
+    private static final String PRICE       = "price";
+    private static final String COST        = "cost";
 
     /**
      * Auxiliary method for returnig Http page with orders
@@ -27,22 +42,25 @@ public class Start extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
 
+
         List<String> users = Arrays.asList(request.getParameterMap().getOrDefault("user", new String[0]));
         response.setContentType("text/html;charset=UTF-8"); // Получение потока для вывода ответа
+
+        LocaleProvider locale = initLocale(request);
 
         try (PrintWriter out = response.getWriter()) {
             out.println("<html>");
             out.println("<head><title></title></head>"); out.println("<body>");
 
-            out.println("<h1>Список заказов пользователей: " + String.join(", ", users) + "</h1>");
+            out.println("<h1>" + locale.getUi(ORDER_LIST) + String.join(", ", users) + "</h1>");
             out.println("<table border='1'>");
-            out.println("<tr><td><b>Номер заказа</b></td>" +
-                    "<td><b>Пользователь</b></td>" +
-                    "<td><b>ФИО</b></td>" +
-                    "<td><b>Коды товаров</b>" +
-                    "</td><td><b>Количество</b>" +
-                    "</td><td><b>Цена</b></td>" +
-                    "</td><td><b>Итого</b></td>" +
+            out.println("<tr><td><b>" + locale.getUi(ORDER_NUMBER) + "</b></td>" +
+                    "<td><b>" + locale.getUi(USER)      + "</b></td>" +
+                    "<td><b>" + locale.getUi(FULL_NAME) +"</b></td>" +
+                    "<td><b>" + locale.getUi(PRODUCT_ID)+"</b></td>" +
+                    "<td><b>" + locale.getUi(AMOUNT)    +"</b></td>" +
+                    "<td><b>" + locale.getUi(PRICE)     +"</b></td></td>" +
+                    "<td><b>" + locale.getUi(COST)      +"</b></td>" +
                     "</tr>");
             if (users.isEmpty() || users.contains("00000000"))
                 out.println("<tr><td>1_030_203_023_000</td>" +
@@ -92,5 +110,16 @@ public class Start extends HttpServlet {
             HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
+    }
+
+    private LocaleProvider initLocale(HttpServletRequest request) throws IOException {
+        String lang = request.getParameter(LANGUAGE);
+        if (lang != null){
+            Vector<Locale> vector = new Vector<>();
+            vector.add(Locale.forLanguageTag(lang));
+            return LocaleConfig.getLocaleProvider(vector.elements());
+        } else {
+            return LocaleConfig.getLocaleProvider(request.getLocales());
+        }
     }
 }
