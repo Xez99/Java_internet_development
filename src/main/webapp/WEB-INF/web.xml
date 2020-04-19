@@ -25,11 +25,22 @@
         <url-pattern>/ordersTable.jsp</url-pattern>
     </servlet-mapping>
 
-    <security-role>
-        <role-name>user</role-name>
-    </security-role>
-
     <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Secured</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <!--<security-role>
+        <role-name>user</role-name>
+    </security-role> -->
+
+    <!--<security-constraint>
         <web-resource-collection>
             <web-resource-name>Orders</web-resource-name>
             <url-pattern>/orders</url-pattern>
@@ -42,6 +53,6 @@
     <login-config>
         <auth-method>BASIC</auth-method>
         <realm-name>Order list</realm-name>
-    </login-config>
+    </login-config> -->
 
 </web-app>
