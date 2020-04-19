@@ -19,9 +19,29 @@
         <jsp-file>/404.jsp</jsp-file>
     </servlet>
 
+
     <servlet-mapping>
         <servlet-name>404</servlet-name>
         <url-pattern>/ordersTable.jsp</url-pattern>
     </servlet-mapping>
+
+    <security-role>
+        <role-name>user</role-name>
+    </security-role>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Orders</web-resource-name>
+            <url-pattern>/orders</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>user</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <login-config>
+        <auth-method>BASIC</auth-method>
+        <realm-name>Order list</realm-name>
+    </login-config>
 
 </web-app>
